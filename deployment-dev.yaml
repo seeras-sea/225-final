@@ -50,17 +50,17 @@ spec:
         environment: dev
     spec:
       containers:
-        - name: flask
-          image: cithit/colli369:latest
-          ports:
-            - containerPort: 5000
-          volumeMounts:
-            - name: nfs-storage
-              mountPath: /nfs
-      volumes:
+      - name: flask-container
+        image: cithit/colli369:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
         - name: nfs-storage
-          persistentVolumeClaim:
-            claimName: flask-pvc-dev
+          mountPath: /nfs
+      volumes:
+      - name: nfs-storage
+        persistentVolumeClaim:
+          claimName: flask-pvc-dev
 ---
 apiVersion: v1
 kind: Service
@@ -77,3 +77,4 @@ spec:
     - port: 5000
       targetPort: 5000
   type: ClusterIP
+
