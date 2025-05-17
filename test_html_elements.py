@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.common.exceptions import WebDriverException, TimeoutException, NoSuchElementException
 import os
 import time
 import socket
@@ -66,11 +66,11 @@ class TestHtmlElements(unittest.TestCase):
         """Check if the hostname in the URL can be resolved."""
         hostname = url.split('//')[1].split(':')[0]
         try:
-            print(f"Resolving hostname: {hostname}")
+            print("Resolving hostname:", hostname)
             ip = socket.gethostbyname(hostname)
-            print(f"Hostname {hostname} resolved to {ip}")
+            print("Hostname", hostname, "resolved to", ip)
         except socket.gaierror as e:
-            print(f"DNS resolution failed for {hostname}: {e}")
+            print("DNS resolution failed for", hostname, ":", str(e))
             print("Attempting to use /etc/hosts or equivalent...")
     
     def test_page_title(self):
@@ -78,7 +78,7 @@ class TestHtmlElements(unittest.TestCase):
         try:
             print("Page title:", self.driver.title)
             self.assertEqual("Contact Manager", self.driver.title)
-        except Exception as e:
+        except AssertionError as e:
             print("Error in test_page_title:", str(e))
             # Take screenshot for debugging
             self.driver.save_screenshot('title_test_error.png')
@@ -102,7 +102,7 @@ class TestHtmlElements(unittest.TestCase):
             self.assertIsNotNone(name_input)
             self.assertIsNotNone(phone_input)
             self.assertIsNotNone(email_input)
-        except Exception as e:
+        except (TimeoutException, NoSuchElementException, AssertionError) as e:
             print("Error in test_form_exists:", str(e))
             # Take screenshot for debugging
             self.driver.save_screenshot('form_test_error.png')
@@ -121,7 +121,7 @@ class TestHtmlElements(unittest.TestCase):
                 EC.presence_of_all_elements_located((By.TAG_NAME, "th"))
             )
             self.assertEqual(len(headers), 5)  # ID, Name, Phone, Email, Action
-        except Exception as e:
+        except (TimeoutException, NoSuchElementException, AssertionError) as e:
             print("Error in test_table_exists:", str(e))
             # Take screenshot for debugging
             self.driver.save_screenshot('table_test_error.png')
@@ -131,7 +131,7 @@ class TestHtmlElements(unittest.TestCase):
         if hasattr(self, 'driver'):
             try:
                 self.driver.quit()
-            except Exception as e:
+            except WebDriverException as e:
                 print("Error in tearDown:", str(e))
 
 if __name__ == "__main__":
