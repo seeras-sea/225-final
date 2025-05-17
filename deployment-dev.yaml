@@ -64,4 +64,16 @@ spec:
 ---
 apiVersion: v1
 kind: Service
-metadata
+metadata:
+  name: flask-dev-service
+  labels:
+    app: flask
+    environment: dev
+spec:
+  selector:
+    app: flask
+    environment: dev
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP
