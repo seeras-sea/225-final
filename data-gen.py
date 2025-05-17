@@ -1,6 +1,5 @@
 import sqlite3
 import random
-import os
 
 DATABASE = '/nfs/app.db'
 
