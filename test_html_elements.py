@@ -26,7 +26,7 @@ class TestHtmlElements(unittest.TestCase):
                 break
             except Exception as e:
                 if attempt < max_retries - 1:
-                    print("Connection attempt", attempt+1, "failed:", str(e))
+                    print("Connection attempt", attempt + 1, "failed:", str(e))
                     print("Retrying in 5 seconds...")
                     time.sleep(5)
                 else:
