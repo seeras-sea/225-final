@@ -2,6 +2,7 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
+from selenium.common.exceptions import WebDriverException
 import os
 import time
 
@@ -24,7 +25,7 @@ class TestHtmlElements(unittest.TestCase):
                 self.driver.get(flask_url)
                 print("Successfully connected to", flask_url)
                 break
-            except Exception as e:
+            except WebDriverException as e:
                 if attempt < max_retries - 1:
                     print("Connection attempt", attempt + 1, "failed:", str(e))
                     print("Retrying in 5 seconds...")
