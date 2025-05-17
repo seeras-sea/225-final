@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /srv/nfs/colli369
+    path: /srv/nfs/roseaw
     server: 10.48.10.140
   persistentVolumeReclaimPolicy: Retain
 ---
