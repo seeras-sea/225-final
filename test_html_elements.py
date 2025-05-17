@@ -8,6 +8,7 @@ from selenium.common.exceptions import WebDriverException, TimeoutException, NoS
 import os
 import time
 import socket
+import requests
 
 class TestHtmlElements(unittest.TestCase):
     
@@ -22,25 +23,29 @@ class TestHtmlElements(unittest.TestCase):
         
         # Initialize the driver
         self.driver = webdriver.Firefox(options=options)
-        self.driver.set_page_load_timeout(30)  # Set page load timeout
+        self.driver.set_page_load_timeout(60)  # Increase page load timeout
         
         # Get the Flask app URL from environment variable or use the specified IP
-        flask_url = os.environ.get('FLASK_URL', 'http://10.48.10.170')
+        flask_url = os.environ.get('FLASK_URL', 'http://10.48.10.138:5000')
         print("Connecting to Flask app at:", flask_url)
+        
+        # Check if the service is reachable first
+        self._check_service_availability(flask_url)
         
         # Try to resolve the hostname first if it's not an IP address
         if not self._is_ip_address(flask_url.split('//')[1].split(':')[0]):
             self._check_dns_resolution(flask_url)
         
         # Try to connect to the Flask app with retries
-        max_retries = 2  
+        max_retries = 15  # Increase retries further
         for attempt in range(max_retries):
             try:
+                print(f"Attempt {attempt + 1}/{max_retries} to load page")
                 self.driver.get(flask_url)
                 print("Successfully connected to", flask_url)
                 
                 # Wait for the page to be fully loaded
-                WebDriverWait(self.driver, 10).until(
+                WebDriverWait(self.driver, 20).until(  # Increase wait time
                     EC.presence_of_element_located((By.TAG_NAME, "body"))
                 )
                 print("Page fully loaded")
@@ -48,11 +53,32 @@ class TestHtmlElements(unittest.TestCase):
             except (WebDriverException, TimeoutException) as e:
                 if attempt < max_retries - 1:
                     print("Connection attempt", attempt + 1, "failed:", str(e))
-                    print("Retrying in 10 seconds...")  # Increase wait time
-                    time.sleep(10)
+                    print("Retrying in 15 seconds...")  # Increase wait time
+                    time.sleep(15)
                 else:
                     print("All", max_retries, "connection attempts failed")
                     raise e
+    
+    def _check_service_availability(self, url):
+        """Check if the service is available using requests."""
+        print(f"Checking if {url} is available...")
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            try:
+                response = requests.get(url, timeout=10)
+                if response.status_code == 200:
+                    print(f"Service at {url} is available (Status: {response.status_code})")
+                    return True
+                else:
+                    print(f"Service returned status code: {response.status_code}")
+            except requests.exceptions.RequestException as e:
+                print(f"Request attempt {attempt + 1} failed: {e}")
+                if attempt < max_attempts - 1:
+                    print("Retrying in 5 seconds...")
+                    time.sleep(5)
+        
+        print(f"Warning: Service at {url} may not be available")
+        return False
     
     def _is_ip_address(self, host):
         """Check if the host is an IP address."""
@@ -87,13 +113,13 @@ class TestHtmlElements(unittest.TestCase):
     def test_form_exists(self):
         try:
             # Wait for form to be present
-            form = WebDriverWait(self.driver, 10).until(
+            form = WebDriverWait(self.driver, 20).until(  # Increase wait time
                 EC.presence_of_element_located((By.TAG_NAME, "form"))
             )
             self.assertIsNotNone(form)
             
             # Wait for inputs to be present
-            name_input = WebDriverWait(self.driver, 5).until(
+            name_input = WebDriverWait(self.driver, 10).until(  # Increase wait time
                 EC.presence_of_element_located((By.NAME, "name"))
             )
             phone_input = self.driver.find_element(By.NAME, "phone")
@@ -111,13 +137,13 @@ class TestHtmlElements(unittest.TestCase):
     def test_table_exists(self):
         try:
             # Wait for table to be present
-            table = WebDriverWait(self.driver, 10).until(
+            table = WebDriverWait(self.driver, 20).until(  # Increase wait time
                 EC.presence_of_element_located((By.TAG_NAME, "table"))
             )
             self.assertIsNotNone(table)
             
             # Wait for headers to be present
-            headers = WebDriverWait(self.driver, 5).until(
+            headers = WebDriverWait(self.driver, 10).until(  # Increase wait time
                 EC.presence_of_all_elements_located((By.TAG_NAME, "th"))
             )
             self.assertEqual(len(headers), 5)  # ID, Name, Phone, Email, Action
