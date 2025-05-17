@@ -2,6 +2,8 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
+import os
+import time
 
 class TestHtmlElements(unittest.TestCase):
     
@@ -10,11 +12,30 @@ class TestHtmlElements(unittest.TestCase):
         options = Options()
         options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
-        # Use the service IP address for the Flask app
-        self.driver.get("http://flask-dev-service:5000")
+        
+        # Get the Flask app URL from environment variable or use default
+        flask_url = os.environ.get('FLASK_URL', 'http://flask-dev-service:5000')
+        print(f"Connecting to Flask app at: {flask_url}")
+        
+        # Try to connect to the Flask app with retries
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                self.driver.get(flask_url)
+                print(f"Successfully connected to {flask_url}")
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"Connection attempt {attempt+1} failed: {str(e)}")
+                    print(f"Retrying in 5 seconds...")
+                    time.sleep(5)
+                else:
+                    print(f"All {max_retries} connection attempts failed")
+                    raise e
     
     def test_page_title(self):
         # Check if the page title is correct
+        print(f"Page title: {self.driver.title}")
         self.assertEqual("Contact Manager", self.driver.title)
     
     def test_form_exists(self):
