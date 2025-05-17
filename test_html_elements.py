@@ -33,7 +33,7 @@ class TestHtmlElements(unittest.TestCase):
             self._check_dns_resolution(flask_url)
         
         # Try to connect to the Flask app with retries
-        max_retries = 10  # Increase retries
+        max_retries = 2  
         for attempt in range(max_retries):
             try:
                 self.driver.get(flask_url)
