@@ -69,8 +69,7 @@ class TestHtmlElements(unittest.TestCase):
                 if response.status_code == 200:
                     print(f"Service at {url} is available (Status: {response.status_code})")
                     return True
-                else:
-                    print(f"Service returned status code: {response.status_code}")
+                print(f"Service returned status code: {response.status_code}")
             except requests.exceptions.RequestException as e:
                 print(f"Request attempt {attempt + 1} failed: {e}")
                 if attempt < max_attempts - 1:
