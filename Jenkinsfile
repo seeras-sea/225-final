@@ -97,8 +97,8 @@ pipeline {
                     // Get the Flask service IP
                     def flaskServiceIP = sh(script: "kubectl get service flask-dev-service -o jsonpath='{.spec.clusterIP}'", returnStdout: true).trim()
                     
-                    // Build the test image
-                    sh "docker build -t qa-tests -f Dockerfile.test ."
+                    // Build the test image with --no-cache to ensure fresh build
+                    sh "docker build --no-cache -t qa-tests -f Dockerfile.test ."
                     
                     // Run the tests with the Flask service IP as an environment variable
                     sh "docker run --network=host -e FLASK_URL=http://${flaskServiceIP}:5000 qa-tests"
