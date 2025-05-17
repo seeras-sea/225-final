@@ -1,6 +1,4 @@
-from flask import Flask, request, render_template_string, redirect, url_for
-import sqlite3
-import os
+from flask import Flask, request, render_template_string, redirect
 
 app = Flask(__name__)
 
@@ -8,6 +6,7 @@ app = Flask(__name__)
 DATABASE = '/nfs/app.db'
 
 def get_db():
+    import sqlite3
     db = sqlite3.connect(DATABASE)
     db.row_factory = sqlite3.Row  # Enables name-based access to columns
     return db
@@ -105,10 +104,10 @@ def add_contact():
     
     return redirect('/')
 
-@app.route('/delete/<int:id>', methods=['POST'])
-def delete_contact(id):
+@app.route('/delete/<int:contact_id>', methods=['POST'])
+def delete_contact(contact_id):
     db = get_db()
-    db.execute('DELETE FROM contacts WHERE id = ?', (id,))
+    db.execute('DELETE FROM contacts WHERE id = ?', (contact_id,))
     db.commit()
     
     return redirect('/')
