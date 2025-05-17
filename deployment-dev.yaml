@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: flask-pv-dev
+  labels:
+    type: nfs
+    environment: dev
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /srv/nfs/colli369
+    server: 10.48.10.140
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: flask-pvc-dev
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      type: nfs
+      environment: dev
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-dev-deployment
+  labels:
+    app: flask
+    environment: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask
+      environment: dev
+  template:
+    metadata:
+      labels:
+        app: flask
+        environment: dev
+    spec:
+      containers:
+        - name: flask
+          image: cithit/colli369:latest
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - name: nfs-storage
+              mountPath: /nfs
+      volumes:
+        - name: nfs-storage
+          persistentVolumeClaim:
+            claimName: flask-pvc-dev
+---
+apiVersion: v1
+kind: Service
+metadata

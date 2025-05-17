@@ -1,0 +1,27 @@
+FROM python:3.9-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the current directory contents into the container
+COPY . .
+
+# Install Python dependencies
+RUN pip install pytest selenium
+
+# Install Firefox and GeckoDriver for Selenium tests
+RUN apt-get update && apt-get install -y \
+    firefox-esr \
+    wget \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and install GeckoDriver
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz \
+    && tar -xzf geckodriver-v0.30.0-linux64.tar.gz \
+    && chmod +x geckodriver \
+    && mv geckodriver /usr/local/bin/ \
+    && rm geckodriver-v0.30.0-linux64.tar.gz
+
+# Command to run the tests
+CMD ["python", "-m", "pytest", "test_html_elements.py", "-v"]
