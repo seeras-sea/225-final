@@ -11,7 +11,7 @@ spec:
     - ReadWriteMany
   nfs:
     path:  /srv/nfs/colli369         #local reference
-    server: 10.48.10.140
+    server: 10.48.10.216
   persistentVolumeReclaimPolicy: Retain
 ---
 apiVersion: v1
