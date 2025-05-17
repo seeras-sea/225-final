@@ -61,6 +61,8 @@ pipeline {
             steps {
                 script {
                     sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
+                    // Delete existing deployment first to avoid immutable field error
+                    sh "kubectl delete deployment flask-dev-deployment --ignore-not-found=true"
                     sh "kubectl apply -f deployment-dev.yaml"
                     sh "sleep 15" // Wait for deployment
                     slackSend channel: "${SLACK_CHANNEL}", color: "good", message: "🔄 Deployed to DEV environment"
