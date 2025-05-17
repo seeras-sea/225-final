@@ -8,7 +8,8 @@ from selenium.common.exceptions import WebDriverException, TimeoutException, NoS
 import os
 import time
 import socket
-import requests
+import urllib.request
+import urllib.error
 
 class TestHtmlElements(unittest.TestCase):
     
@@ -60,17 +61,17 @@ class TestHtmlElements(unittest.TestCase):
                     raise e
     
     def _check_service_availability(self, url):
-        """Check if the service is available using requests."""
+        """Check if the service is available using urllib."""
         print(f"Checking if {url} is available...")
         max_attempts = 5
         for attempt in range(max_attempts):
             try:
-                response = requests.get(url, timeout=10)
-                if response.status_code == 200:
-                    print(f"Service at {url} is available (Status: {response.status_code})")
-                    return True
-                print(f"Service returned status code: {response.status_code}")
-            except requests.exceptions.RequestException as e:
+                with urllib.request.urlopen(url, timeout=10) as response:
+                    if response.status == 200:
+                        print(f"Service at {url} is available (Status: {response.status})")
+                        return True
+                    print(f"Service returned status code: {response.status}")
+            except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as e:
                 print(f"Request attempt {attempt + 1} failed: {e}")
                 if attempt < max_attempts - 1:
                     print("Retrying in 5 seconds...")
