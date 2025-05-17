@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template_string, redirect
+import sqlite3
 
 app = Flask(__name__)
 
@@ -6,7 +7,6 @@ app = Flask(__name__)
 DATABASE = '/nfs/app.db'
 
 def get_db():
-    import sqlite3
     db = sqlite3.connect(DATABASE)
     db.row_factory = sqlite3.Row  # Enables name-based access to columns
     return db
@@ -117,3 +117,4 @@ if __name__ == '__main__':
     init_db()
     # Run the app
     app.run(host='0.0.0.0', port=5000)
+
